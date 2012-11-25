@@ -29,7 +29,7 @@ int getYear()
 	return i;
 }
 
-#define DAYS_IN_MONTH()	(__isleap(getYear()) ? monthdays_leap : monthdays)
+#define MONTH_FOR_YEAR(y) (__isleap(y) ? monthdays_leap : monthdays)
 
 int getSecForYear(int y)
 {
@@ -60,18 +60,25 @@ int getMonth()
 {
 	int m = 0;
 	int day = getDays();
+	int y = getYear();
+	int *mdays = MONTH_FOR_YEAR(y);
+
 	int i;
-	for (i = 0; i < day; i += DAYS_IN_MONTH()[m])
+	for (i = 0; i < day; i += mdays[m])
 		m++;
+
 	return m-1;
 }
 
 int getDayofMonth(int m)
 {
 	int day = 0;
+	int y = getYear();
+	int *mdays = MONTH_FOR_YEAR(y);
+
 	int i;
 	for (i = 0; i < 12 && i <= m; i++) {
-		day += DAYS_IN_MONTH()[i];
+		day += mdays[i];
 	}
 	return day;
 }
@@ -85,3 +92,19 @@ int getDay()
 	return days_now - days_prev;
 }
 
+int getDayofWeek()
+{
+	int day = 0;
+	int m = getMonth();
+	int y = getYear();
+	int d = getDay();
+	int *mdays = MONTH_FOR_YEAR(y);
+
+	int i;
+	for (i = 0; i < m; i++)
+		day += mdays[i];
+
+	day += d + y + (y / 4) - 2;
+
+	return day % 7;
+}
