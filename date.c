@@ -5,7 +5,8 @@
 
 #define SEC_IN_Y(Y)	(dysize(Y) * 24 * 3600)
 #define SEC_IN_D	(24 * 3600)
-#define getTime()	time(NULL)
+#define getUTCTime()	time(NULL)
+#define getTime()	(getUTCTime() + (3600 * 5))
 
 int monthdays[] = {
 	31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
@@ -36,11 +37,21 @@ int getSecForYear(int y)
 	time_t t = 0;
 
 	int i;
-	for (i = 1970; ; i++) {
+	for (i = 1970; i <= y; i++)
 		t += SEC_IN_Y(i);
-		if (i == y)
-			break;
-	}
+
+	return t;
+}
+
+int getSecFortoday()
+{
+	int y = getYear();
+	int d = getDays();
+	time_t t = getSecForYear(y-1);
+
+	int i;
+	for (i = 0; i < d; i++)
+		t += SEC_IN_D;
 
 	return t;
 }
@@ -108,3 +119,39 @@ int getDayofWeek()
 
 	return day % 7;
 }
+
+int getHour()
+{
+	int t = getSecFortoday();
+	int t1 = getTime();
+
+	int d = (t1 - t) / 3600;
+
+	return d;
+}
+
+int getMinute()
+{
+	int t = getSecFortoday();
+	t += getHour() * 3600;
+
+	int t1 = getTime();
+
+	int d = (t1 - t) / 60;
+
+	return d;
+}
+
+int getSecond()
+{
+	int t = getSecFortoday();
+	t += getHour() * 3600;
+	t += getMinute() * 60;
+
+	int t1 = getTime();
+
+	int d = (t1 - t);
+
+	return d;
+}
+
